@@ -56,7 +56,9 @@ app.use((req, res, next) => {
 });
 
 //3) Routes
+const userRouter = require(`${__dirname}/routes/usersRoutes.js`);
 
+app.use('/api/users', userRouter);
 
 app.all('*', (req, res, next) => {
   next(new AppError(`Can not find ${req.originalUrl} on this server!`, 404));
