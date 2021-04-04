@@ -57,8 +57,10 @@ app.use((req, res, next) => {
 
 //3) Routes
 const userRouter = require(`${__dirname}/routes/usersRoutes.js`);
+const mainPumpRoutes = require(`${__dirname}/routes/mainPumpRoutes.js`)
 
 app.use('/api/users', userRouter);
+app.use('/api/mainPump', mainPumpRoutes);
 
 app.all('*', (req, res, next) => {
   next(new AppError(`Can not find ${req.originalUrl} on this server!`, 404));
