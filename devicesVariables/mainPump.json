@@ -1,0 +1,25 @@
+{
+  "view": {
+    "state": 0,
+    "flowSpeed": 0,
+    "timer": 0,
+    "alarms": 0
+  },
+  "control": {
+    "block": false,
+    "manual": false,
+    "onOffManual": false,
+    "timerSet": 0
+  },
+  "config": {
+    "jobMode": 0,
+    "levelSensorSelect": 0,
+    "timeToLevelAlarm": 0,
+    "flowSensorSelect": 0,
+    "impulsesPerLiter": 0,
+    "timeToFlowAlarm": 0,
+    "maxFlowRange": 0,
+    "minFlowRange": 0,
+    "load": 0
+  }
+}
