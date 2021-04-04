@@ -1,0 +1,24 @@
+{
+  "view": {
+    "state": 0,
+    "timer": 0,
+    "CO2Level": 0,
+    "CO2ValveState": 0
+  },
+  "control": {
+    "block": false,
+    "manual": false,
+    "onOffManual": false,
+    "timeOn": 0,
+    "timeOff": 0,
+    "blockCO2": false,
+    "manualCO2": false,
+    "onOffCO2Valve": false,
+    "CO2set": 0
+  },
+  "config": {
+    "regulationTimeCO2": 0,
+    "frequencyOfRegCO2": 0,
+    "CO2safeValue": 0
+  }
+}

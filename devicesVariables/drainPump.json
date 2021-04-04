@@ -1,0 +1,18 @@
+{
+  "view": {
+    "state": 0,
+    "waterLevel": 0,
+    "timer": 0,
+    "alarms": 0
+  },
+  "control": {
+    "block": false,
+    "manual": false,
+    "onOffManual": false,
+    "timerSet": 0
+  },
+  "config": {
+    "levelSensorSelect": 0,
+    "timeToLevelAlarm": 0
+  }
+}

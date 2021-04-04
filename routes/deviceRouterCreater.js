@@ -1,5 +1,6 @@
 const express = require('express');
 const deviceController = require('../controllers/deviceController');
+const authController = require('../controllers/authController');
 const fs = require('fs');
 const patch = require('path');
 
@@ -14,8 +15,13 @@ const deviceRouterCreater = (jsonVarFile, deviceName) => {
   router
     .route('/control')
     .get(device.getControl.bind(device))
-    .patch(device.updateControl.bind(device));
+    .patch(
+      authController.protect,
+      authController.restrictTo('admin'),
+      device.updateControl.bind(device)
+    );
 
+  router.use(authController.protect, authController.restrictTo('admin'));
   router
     .route('/config')
     .get(device.getConfig.bind(device))

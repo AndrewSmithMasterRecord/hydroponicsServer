@@ -40,6 +40,7 @@ class DeviceController {
   getConfig(req, res, next) {
     this.sendData(res, this.variables.config);
   }
+
   updateControl(req, res, next) {
     if (!req.body) {
       next(new AppError('Empty request object!', 400));
@@ -54,6 +55,7 @@ class DeviceController {
     this.updateVariablesObject(this.variables.control, reqObj);
     this.sendData(res, reqObj);
   }
+  
   updateConfig = (req, res, next) => {
     if (!req.body) {
       next(new AppError('Empty request object!', 400));

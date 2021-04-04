@@ -1,0 +1,17 @@
+{
+  "view": {
+    "state": 0,
+    "startTime": 0,
+    "durationOn": 0,
+    "alarms": 0
+  },
+  "control": {
+    "block": false,
+    "manual": false,
+    "onOffManual": false,
+    "startTimeSet": 0,
+    "durationSet": 0
+  },
+  "config": {
+  }
+}
