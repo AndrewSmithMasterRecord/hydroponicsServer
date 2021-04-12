@@ -58,9 +58,11 @@ app.use((req, res, next) => {
 //3) Routes
 const userRouter = require(`${__dirname}/routes/usersRoutes.js`);
 const deviceRouterCreater = require(`${__dirname}/routes/deviceRouterCreater.js`);
+const journalRouter = require(`${__dirname}/routes/journalRoutes.js`);
 
 app.use('/api/users', userRouter);
-app.use('/api/mainPump1', deviceRouterCreater("mainPump.json", "mainPump1"));
+app.use('/api/mainPump1', deviceRouterCreater('mainPump.json', 'mainPump1'));
+app.use('/api/journal', journalRouter);
 
 app.all('*', (req, res, next) => {
   next(new AppError(`Can not find ${req.originalUrl} on this server!`, 404));

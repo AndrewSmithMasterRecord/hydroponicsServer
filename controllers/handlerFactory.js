@@ -32,6 +32,7 @@ exports.updateOne = (Model) =>
 
 exports.createOne = (Model) =>
   asyncCatch(async (req, res) => {
+    if(req.user) req.body.user = req.user.id;
     const data = await Model.create(req.body);
     res.status(201).send({
       status: 'success',
@@ -59,15 +60,7 @@ exports.getOne = (Model, popOptions) =>
   });
 
 exports.getAll = Model => asyncCatch(async (req, res) => {
-  //   const numTours = await Tour.countDocuments();
-  //   if (skip >= numTours) throw new Error('This page does not exsist!');
-  // }
-
-  // query = query.skip(skip).limit(limit);
-  let findObj = {};
-  if (req.params.tourId) findObj = { tour: req.params.tourId };
-
-  const features = new APIfeatures(Model.find(findObj), req.query)
+  const features = new APIfeatures(Model.find(), req.query)
     .filter()
     .sort()
     .limitingFields()
