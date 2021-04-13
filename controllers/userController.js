@@ -2,14 +2,7 @@ const User = require('../models/userModel');
 const AppError = require('../utils/appError');
 const asyncCatch = require('../utils/asyncCatch');
 const handlerFactory = require('./handlerFactory');
-
-const filterObj = (obj, ...alowFields) => {
-  let newObj = {};
-  Object.keys(obj).forEach((el) => {
-    if (alowFields.includes(el)) newObj[el] = obj[el];
-  });
-  return newObj;
-};
+const filterObj = require('../utils/filterObj');
 
 exports.updateMe = asyncCatch(async (req, res, next) => {
   //1) Create error if user posts passwor data

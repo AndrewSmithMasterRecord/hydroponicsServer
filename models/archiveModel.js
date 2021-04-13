@@ -5,10 +5,18 @@ const archiveShema = new mongoose.Schema({
     type: Date,
     default: Date.now(),
   },
-  temperature: Number,
-  humidity: Number,
-  pH: Number,
+  temperature: {
+    type: Number,
+    default: 0,
+  },
+  humidity: {
+    type: Number,
+    default: 0,
+  },
+  pH: {
+    type: Number,
+    default: 0,
+  },
 });
 
-
-module.exports = mongoose.model("Archive", archiveShema);
+module.exports = mongoose.model('Archive', archiveShema);
