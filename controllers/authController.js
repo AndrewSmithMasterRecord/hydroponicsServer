@@ -20,7 +20,9 @@ const createSendToken = (user, statusCode, res) => {
     ),
     httpOnly: true,
   };
-  if (process.env.NODE_ENV === 'production') cookieOptions.secure = true;
+  if (process.env.NODE_ENV === 'production')
+    cookieOptions.secure =
+      req.secure || req.headers('x-forwarded-proto') === 'https';
 
   user.password = undefined;
 
@@ -62,6 +64,14 @@ exports.sign = asyncCatch(async (req, res, next) => {
   createSendToken(user, 200, res);
 });
 
+exports.logout = (req, res) => {
+  res.cookie('jwt', 'loggedout', {
+    expires: new Date(Date.now() + 10 * 1000),
+    httpOnly: true,
+  });
+  res.status(200).json({ status: 'success' });
+};
+
 exports.protect = asyncCatch(async (req, res, next) => {
   //1) Get token and check if it's there
   let token;
@@ -70,9 +80,11 @@ exports.protect = asyncCatch(async (req, res, next) => {
     req.headers.authorization.startsWith('Bearer')
   ) {
     token = req.headers.authorization.split(' ')[1];
+  } else if (req.cookies.jwt) {
+    token = req.cookies.jwt;
   }
   if (!token) {
-    next(
+    return next(
       new AppError('You are not logged in! Please login to get access.', 401)
     );
   }

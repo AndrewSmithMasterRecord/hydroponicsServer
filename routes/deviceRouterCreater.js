@@ -14,7 +14,7 @@ const deviceRouterCreater = (jsonVarFile, deviceName) => {
   router.route('/view').get(device.getView.bind(device));
   router
     .route('/control')
-    .get(device.getControl.bind(device))
+    .get(authController.protect, device.getControl.bind(device))
     .patch(
       authController.protect,
       authController.restrictTo('admin'),

@@ -7,8 +7,13 @@ const helmet = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
+const cookieParser = require('cookie-parser');
+const compression = require('compression');
+const cors = require('cors');
 
 const app = express();
+
+app.enable('trust proxy');
 
 //1)Global Middleware
 //Set security http headers
@@ -26,6 +31,7 @@ const limiter = rateLimit({
 app.use('/api', limiter);
 
 app.use(express.json({ limit: '10kb' }));
+app.use(cookieParser());
 
 //Data sanitization against noSQL query injection
 app.use(mongoSanitize());
@@ -46,6 +52,11 @@ app.use(xss());
 //     ],
 //   })
 // );
+
+app.use(compression());
+
+app.use(cors());
+app.options('*', cors());
 
 //Static files from public directory
 //app.use(express.static(`${__dirname}/public`));

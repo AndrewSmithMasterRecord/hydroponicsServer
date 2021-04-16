@@ -5,6 +5,7 @@ const authController = require('../controllers/authController');
 const router = express.Router();
 
 router.post('/login', authController.sign);
+router.get('/logout', authController.logout);
 router.patch('/updateMe', authController.protect, usersController.updateMe);
 router.get(
   '/me',
