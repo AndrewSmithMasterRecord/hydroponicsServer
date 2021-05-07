@@ -3,8 +3,8 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/userModel');
 const AppError = require('../utils/appError');
 const asyncCatch = require('../utils/asyncCatch');
-const sendEmail = require('../utils/email');
-const crypto = require('crypto');
+//const sendEmail = require('../utils/email');
+//const crypto = require('crypto');
 
 const signToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -19,10 +19,11 @@ const createSendToken = (user, statusCode, res) => {
       Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
     ),
     httpOnly: true,
+    sameSite: 'None'
   };
   if (process.env.NODE_ENV === 'production')
-    cookieOptions.secure =
-      req.secure || req.headers('x-forwarded-proto') === 'https';
+    cookieOptions.secure = true;
+      //res.secure || res.headers('x-forwarded-proto') === 'https';
 
   user.password = undefined;
 

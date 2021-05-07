@@ -54,9 +54,13 @@ app.use(xss());
 // );
 
 app.use(compression());
+const corsoptions = {
+  origin: "http://localhost:3000",
+  credentials: true
+}
 
-app.use(cors());
-app.options('*', cors());
+app.use(cors(corsoptions));
+app.options('*', cors(corsoptions));
 
 //Static files from public directory
 //app.use(express.static(`${__dirname}/public`));

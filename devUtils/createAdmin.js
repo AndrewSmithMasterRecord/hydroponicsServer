@@ -18,9 +18,9 @@ mongoose
 const importAdmin = async () => {
   try {
     const user = await User.create({
-      name: process.env.USER,
-      password: process.env.PASSWORD,
-      passwordConfirm: process.env.PASSWORD,
+      name: "andrew", //process.env.USER,
+      password: "12345678", //process.env.PASSWORD,
+      passwordConfirm: "12345678", //process.env.PASSWORD,
       role: "admin"
     });
     console.log(user);
