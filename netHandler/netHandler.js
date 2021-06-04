@@ -79,7 +79,7 @@ class netHandler {
 
   _dataTransferToDevice = (type, sendString) => {
     if (this.state.status != CONNECTED) //если нет подключения
-      return  Promise.reject(new Error(`Error: socket in status - ${this.state.status}!`));
+      return  Promise.reject(new Error(`Socket in status - ${this.state.status}!`));
     let promise;
     switch (type) { //проверяем тип данных
       case DATA_SEND:
@@ -88,7 +88,7 @@ class netHandler {
         promise = new Promise((resolve, reject) => {//создаем промис
           setTimeout(() => {//ждем пока ответ прилетит
             if (this.state.readedData == '') {//ничего не пришло
-              reject(new Error("Error: empty answer!"));
+              reject(new Error("Empty answer!"));
               return;
             }
             //Пришла ли ошибка в ответ
@@ -111,7 +111,7 @@ class netHandler {
         promise = new Promise((resolve, reject) => {
           setTimeout(() => {//таймаут пока не прийдут все строки ответа
             if (this.state.readedData == '') {//ничего не пришло
-              reject(new Error("Error: empty answer!"));
+              reject(new Error("Empty answer!"));
               return;
             }
             //Пришла ли ошибка в ответ
@@ -126,7 +126,7 @@ class netHandler {
             let find = this.state.readedData.match(/\w+?\s\d+/g);
             //Ошибка ничего не нашли
             if (!find)
-              reject(new Error("Error: don't find correct data in answer!"))
+              reject(new Error("Don't find correct data in answer!"))
 
             let result = {};
             let word;
@@ -140,7 +140,7 @@ class netHandler {
         })
         return promise;
       default:
-        return Promise.reject(new Error("Error: data can't be send to device!"));
+        return Promise.reject(new Error("Data can't be send to device!"));
     }
   }
 
@@ -205,9 +205,9 @@ class netHandler {
 
   readData(device, dataType) {
     if (!device)
-      return  Promise.reject(new Error("Error: don't set device!"));
+      return  Promise.reject(new Error("Don't set device!"));
     if (!dataType)
-      return  Promise.reject(new Error("Error: dataType must be set!"));
+      return  Promise.reject(new Error("DataType must be set!"));
     ;
     let promise;
 
@@ -219,7 +219,7 @@ class netHandler {
         reject: reject,
         dataType: DATA_READ,
       })) { //если очередь уже полная
-        reject(new Error("Error: Data don't be send, queue is full!"));
+        reject(new Error("Data don't be send, queue is full!"));
       }
     })
     return promise;
@@ -228,12 +228,12 @@ class netHandler {
 
   setData(device, data) {
     if (!data)
-      return  Promise.reject(new Error("Error: data must be set!"));
+      return  Promise.reject(new Error("Data must be set!"));
     if (Object.keys(data).length == 0)
-      return  Promise.reject(new Error("Error: data not valid!"));
+      return  Promise.reject(new Error("Data not valid!"));
     ;
     if (!device)
-      return  Promise.reject(new Error("Error: don't set device!"));
+      return  Promise.reject(new Error("Don't set device!"));
 
     let promise;
 
@@ -245,7 +245,7 @@ class netHandler {
         reject: reject,
         dataType: DATA_SEND,
       })) { //если очередь уже полная
-        reject(new Error("Error: Data don't be send, queue is full!"));
+        reject(new Error("Data don't be send, queue is full!"));
       }
     })
     return promise;
