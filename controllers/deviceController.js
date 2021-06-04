@@ -1,9 +1,19 @@
 const AppError = require('../utils/appError');
+const asyncCatch = require('../utils/asyncCatch');
 
 class DeviceController {
-  constructor(deviceName, controlVariables) {
-    this.variables = JSON.parse(controlVariables), (this.deviceName = deviceName);
+  constructor(deviceName,  netHandler) {
+    this.deviceName = deviceName;
+    this.netHandler = netHandler;
   }
+
+  variables = {
+    view: {},
+    control: {},
+    config: {},
+    error: '',
+  };
+
   filterRequestBody = (object, valuesObj) => {
     const alowedValues = Object.keys(valuesObj);
     const filtredObj = {};
@@ -15,7 +25,7 @@ class DeviceController {
     } else {
       return filtredObj;
     }
-  }
+  };
   sendData(res, data) {
     res.status(200).json({
       status: 'success',
@@ -30,45 +40,74 @@ class DeviceController {
     }
   }
   getView = (req, res, next) => {
+    if (this.variables.error != '') {
+      return next(new AppError(`${this.variables.error}`, 500));
+    }
     this.sendData(res, this.variables.view);
   };
 
-  getControl(req, res, next) {
+  getControl = asyncCatch(async (req, res, next) => {
+    if (this.variables.error != '') {
+      return next(new AppError(`${this.variables.error}`, 500));
+    }
+
+    this.variables.control = await this.netHandler.readData(
+      this.deviceName,
+      'control'
+    );
     this.sendData(res, this.variables.control);
-  }
+  });
 
-  getConfig(req, res, next) {
+  getConfig = asyncCatch(async (req, res, next) => {
+    if (this.variables.error != '') {
+      return next(new AppError(`${this.variables.error}`, 500));
+    }
+
+    this.variables.config = await this.netHandler.readData(
+      this.deviceName,
+      'config'
+    );
     this.sendData(res, this.variables.config);
-  }
+  });
 
-  updateControl(req, res, next) {
+  updateControl = asyncCatch(async (req, res, next) => {
+    if (!req.body) {
+      return next(new AppError('Empty request object!', 400));
+    }
+
+    await this.netHandler.setData(this.deviceName, req.body);//устанавливаем новое значение
+    this.variables.control = await this.netHandler.readData(//читаем всю секцию
+      this.deviceName,
+      'control'
+    );
+    this.sendData(res, this.variables.control);//отдаем всю секцию
+  });
+
+  updateConfig = asyncCatch( async (req, res, next) => {
     if (!req.body) {
       next(new AppError('Empty request object!', 400));
     }
-    let reqObj = this.filterRequestBody(req.body, this.variables.control);
-    if (!reqObj) {
-      next(new AppError('Empty or incorrect parametrs!', 400));
-    }
+    await this.netHandler.setData(this.deviceName, req.body);
+    this.variables.config = await this.netHandler.readData(
+      this.deviceName,
+      'config'
+    );
 
-    //Здесь будет обмен данными с устройством
+    this.sendData(res, this.variables.config);
+  });
 
-    this.updateVariablesObject(this.variables.control, reqObj);
-    this.sendData(res, reqObj);
-  }
-  
-  updateConfig = (req, res, next) => {
-    if (!req.body) {
-      next(new AppError('Empty request object!', 400));
-    }
-    let reqObj = this.filterRequestBody(req.body, this.variables.config);
-    if (!reqObj) {
-      next(new AppError('Empty or incorrect parametrs!', 400));
-    }
-
-    //Здесь будет обмен данными с устройством
-
-    this.updateVariablesObject(this.variables.config, reqObj);
-    this.sendData(res, reqObj);
+  init = () => { //инициализация автоматического обновления переменных каждую секунду
+    setInterval(async () => {
+      try {
+        this.variables.view = await this.netHandler.readData(
+          this.deviceName,
+          'view'
+        );
+        this.variables.error = '';
+      } catch (error) {
+        this.variables.error = error.message;
+      }
+    }, 1000);
   };
 }
 

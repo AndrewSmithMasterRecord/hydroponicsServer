@@ -1,15 +1,11 @@
 const express = require('express');
 const deviceController = require('../controllers/deviceController');
 const authController = require('../controllers/authController');
-const fs = require('fs');
-const patch = require('path');
 
-const deviceRouterCreater = (jsonVarFile, deviceName) => {
+const deviceRouterCreater = ( deviceName, netHandler) => {
   const router = express.Router();
-  const variables = fs.readFileSync(
-    patch.join(`${__dirname}`, './../devicesVariables', `${jsonVarFile}`)
-  );
-  const device = new deviceController(deviceName, variables);
+  const device = new deviceController(deviceName, netHandler);
+  device.init();
 
   router.route('/view').get(device.getView.bind(device));
   router

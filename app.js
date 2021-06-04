@@ -28,7 +28,9 @@ const limiter = rateLimit({
   windowMs: 60 * 60 * 1000,
   message: 'To many requests from this IP, please try again in an hour!',
 });
-app.use('/api', limiter);
+app.use('/api/users', limiter);//лимитируем только то что надо
+app.use('/api/journal', limiter);
+app.use('/api/archive', limiter);
 
 app.use(express.json({ limit: '10kb' }));
 app.use(cookieParser());
@@ -55,9 +57,9 @@ app.use(xss());
 
 app.use(compression());
 const corsoptions = {
-  origin: "http://localhost:3000",
-  credentials: true
-}
+  origin: 'http://localhost:3000',
+  credentials: true,
+};
 
 app.use(cors(corsoptions));
 app.options('*', cors(corsoptions));
@@ -70,6 +72,10 @@ app.use((req, res, next) => {
   next();
 });
 
+const deviceNet = require('./netHandler/netHandler');
+const netHandler = new deviceNet('192.168.100.155', 5000);
+netHandler.init();
+
 //3) Routes
 const userRouter = require(`${__dirname}/routes/usersRoutes.js`);
 const deviceRouterCreater = require(`${__dirname}/routes/deviceRouterCreater.js`);
@@ -77,7 +83,7 @@ const journalRouter = require(`${__dirname}/routes/journalRoutes.js`);
 const archiveRouter = require(`${__dirname}/routes/archiveRoutes.js`);
 
 app.use('/api/users', userRouter);
-app.use('/api/mainPump1', deviceRouterCreater('mainPump.json', 'mainPump1'));
+app.use('/api/mainPump1', deviceRouterCreater('pump', netHandler));
 app.use('/api/journal', journalRouter);
 app.use('/api/archive', archiveRouter);
 
