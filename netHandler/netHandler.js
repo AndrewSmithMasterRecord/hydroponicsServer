@@ -23,7 +23,11 @@ class netHandler {
       host: null,
       port: null
     },
-    readedData: ""
+    readedData: "",
+    socketDataEnable: false,
+    deviceOperation: null,
+    deviceResolve: null,
+    deviceReject: null
   }
   socketOptions = {
     allowHalfOpen: false,
@@ -41,7 +45,7 @@ class netHandler {
   _FIFOqueue = {
     queue: [],
     counter: 0,
-    max: 40
+    max: 20
   };
 
   socket = new net.Socket(this.socketOptions);
@@ -84,63 +88,34 @@ class netHandler {
     switch (type) { //проверяем тип данных
       case DATA_SEND:
         this.state.readedData = ""; //зануляем строку приема
+        this.state.socketDataEnable = false;
+        this.state.deviceOperation = DATA_SEND;
         this.socket.write(sendString);//отправляем данные в сокет
         promise = new Promise((resolve, reject) => {//создаем промис
-          setTimeout(() => {//ждем пока ответ прилетит
-            if (this.state.readedData == '') {//ничего не пришло
-              reject(new Error("Empty answer!"));
-              return;
-            }
-            //Пришла ли ошибка в ответ
-            let error = this.state.readedData.match(/Error:.+/);
-            if (error) {
-              error = String(error);
-              error = error.slice(7, error.length);
-              reject(new Error(error));
-              return;
-            }
-            //парсим строку ответа в массив типа [слово число]
-            let result = this.state.readedData.match(/\w+/);
-            resolve(result);//резолвим промис если все хорошо
-          }, 100);//Ожидание когда придет весь ответ от устройства
+          this.state.deviceResolve = resolve;
+          this.state.deviceReject = reject;
+          setTimeout(() => {//таймаут ошибки ожидания ответа
+              reject(new Error("SEND timeout!"));
+          }, 1000);
         });
         return promise;
       case DATA_READ:
         this.state.readedData = ""; //зануляем строку приема
+          this.state.socketDataEnable = false;
+          this.state.deviceOperation = DATA_READ;
+
         this.socket.write(sendString);//отправляем данные в сокет
         promise = new Promise((resolve, reject) => {
-          setTimeout(() => {//таймаут пока не прийдут все строки ответа
-            if (this.state.readedData == '') {//ничего не пришло
-              reject(new Error("Empty answer!"));
-              return;
-            }
-            //Пришла ли ошибка в ответ
-            let error = this.state.readedData.match(/Error:.+/);
-            if (error) {
-              error = String(error);
-              error = error.slice(7, error.length);
-              reject(new Error(error));
-              return;
-            }
-            //парсим строку ответа в массив типа [слово число]
-            let find = this.state.readedData.match(/\w+?\s\d+/g);
-            //Ошибка ничего не нашли
-            if (!find)
-              reject(new Error("Don't find correct data in answer!"))
+          this.state.deviceResolve = resolve;
+          this.state.deviceReject = reject;
+          setTimeout(() => {//таймаут ошибки ожидания ответа
+              reject(new Error("READ timeout!"));
+          }, 1000);
 
-            let result = {};
-            let word;
-            //Создаем объект из массива строк
-            for (let i = 0; i < find.length; i++) {
-              word = find[i].match(/\w+/)
-              result[word] = Number(find[i].match(/\d+/));
-            }
-            resolve(result);
-          }, 100); //Ожидание когда придет весь ответ от устройства
         })
         return promise;
       default:
-        return Promise.reject(new Error("Data can't be send to device!"));
+        return  Promise.reject(new Error("Data can't be send to device!"));
     }
   }
 
@@ -170,6 +145,50 @@ class netHandler {
     });
     this.socket.on("data", (data) => {//аккуратненько кладем в стопку принятые данные
       this.state.readedData += data;
+      this.state.socketDataEnable = true;
+      switch (this.state.deviceOperation) {
+        case DATA_READ:
+          //Пришла ли ошибка в ответ
+          let error = this.state.readedData.match(/Error:.+/);
+          if (error) {
+            error = String(error);
+            error = error.slice(7, error.length);
+            this.state.deviceReject(new Error(error));
+            return;
+          }
+          //парсим строку ответа в массив типа [слово число]
+          let find = this.state.readedData.match(/\w+?\s\d+/g);
+          //Ошибка ничего не нашли
+          if (!find)
+            this.state.deviceReject(new Error("Don't find correct data in answer!"))
+
+          let result = {};
+          let word;
+          //Создаем объект из массива строк
+          for (let i = 0; i < find.length; i++) {
+            word = find[i].match(/\w+/)
+            result[word] = Number(find[i].match(/\d+/));
+          }
+          this.state.deviceResolve(result);
+          this.state.deviceOperation = null;
+          break;
+        case DATA_SEND:
+          //Пришла ли ошибка в ответ
+          let errorSend = this.state.readedData.match(/Error:.+/);
+          if (errorSend) {
+            errorSend = String(errorSend);
+            errorSend = errorSend.slice(7, errorSend.length);
+            this.state.deviceReject(new Error(errorSend));
+            return;
+          }
+          //парсим строку ответа в массив типа [слово число]
+          let resultSend = this.state.readedData.match(/\w+/);
+          this.state.deviceResolve(resultSend);//резолвим промис если все хорошо
+          this.state.deviceOperation = null;
+          break;
+        default: break;
+
+      }
     })
 
     this.socket.connect(this.state.connectOptions);
@@ -230,7 +249,7 @@ class netHandler {
     if (!data)
       return  Promise.reject(new Error("Data must be set!"));
     if (Object.keys(data).length == 0)
-      return  Promise.reject(new Error("Data not valid!"));
+      return Promise.reject(new Error("Data not valid!"));
     ;
     if (!device)
       return  Promise.reject(new Error("Don't set device!"));
