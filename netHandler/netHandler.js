@@ -157,7 +157,7 @@ class netHandler {
             return;
           }
           //парсим строку ответа в массив типа [слово число]
-          let find = this.state.readedData.match(/\w+?\s\d+/g);
+          let find = this.state.readedData.match(/\w+?\s-?\d+/g);
           //Ошибка ничего не нашли
           if (!find)
             this.state.deviceReject(new Error("Don't find correct data in answer!"))
@@ -167,7 +167,7 @@ class netHandler {
           //Создаем объект из массива строк
           for (let i = 0; i < find.length; i++) {
             word = find[i].match(/\w+/)
-            result[word] = Number(find[i].match(/\d+/));
+            result[word] = Number(find[i].match(/-?\d+/));
           }
           this.state.deviceResolve(result);
           this.state.deviceOperation = null;
