@@ -83,7 +83,14 @@ const journalRouter = require(`${__dirname}/routes/journalRoutes.js`);
 const archiveRouter = require(`${__dirname}/routes/archiveRoutes.js`);
 
 app.use('/api/users', userRouter);
-app.use('/api/mainPump1', deviceRouterCreater('pump', netHandler));
+app.use('/api/pump', deviceRouterCreater('pump', netHandler));
+app.use('/api/flow0', deviceRouterCreater('flow1', netHandler));
+app.use('/api/flow1', deviceRouterCreater('flow2', netHandler));
+app.use('/api/drain', deviceRouterCreater('drain', netHandler));
+app.use('/api/clock', deviceRouterCreater('clock', netHandler));
+app.use('/api/light', deviceRouterCreater('light', netHandler));
+app.use('/api/ventilation', deviceRouterCreater('ventilation', netHandler));
+app.use('/api/humidity', deviceRouterCreater('humidity', netHandler));
 app.use('/api/journal', journalRouter);
 app.use('/api/archive', archiveRouter);
 

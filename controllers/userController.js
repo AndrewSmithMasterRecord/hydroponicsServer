@@ -46,7 +46,7 @@ exports.getMe = (req, res, next) => {
 };
 
 exports.updateFilter = (req, res, next) => {
-  const filtredBody = filterObj(req.body, 'name');
+  const filtredBody = filterObj(req.body, 'name', 'role');
   req.body = filtredBody;
   next();
 };

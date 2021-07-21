@@ -159,8 +159,10 @@ class netHandler {
           //парсим строку ответа в массив типа [слово число]
           let find = this.state.readedData.match(/\w+?\s-?\d+/g);
           //Ошибка ничего не нашли
-          if (!find)
-            this.state.deviceReject(new Error("Don't find correct data in answer!"))
+          if (!find){
+            this.state.deviceReject(new Error("Don't find correct data in answer!"));
+            return;
+          }
 
           let result = {};
           let word;
